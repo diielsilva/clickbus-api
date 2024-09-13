@@ -6,6 +6,7 @@ import com.diel.dev.clickbus.shared.exceptions.ConstraintConflictException;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Service
 public class PlaceService {
@@ -29,6 +30,14 @@ public class PlaceService {
         toCreate.setCreatedAt(createdAt);
 
         return repository.save(toCreate);
+    }
+
+    public List<Place> retrieveAll(String name) {
+        if (name == null || name.isEmpty() || name.isBlank()) {
+            return repository.findAll();
+        }
+
+        return repository.findByNameContainingIgnoreCase(name);
     }
 
     private String getSlug(String name) {

@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.containers.MySQLContainer;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -71,6 +72,60 @@ class PlaceServiceTest {
         repository.save(toCreate);
 
         assertThrows(ConstraintConflictException.class, () -> service.create(toCreate));
+    }
+
+    @Test
+    @DisplayName(value = "Should return all places, when no name was specified")
+    void retrieveAll_ShouldReturnPlaces_WhenNoNameWasSpecified() {
+        List<Place> toCreate = List.of(
+                new Place(
+                        "Paulista Avenue",
+                        "paulista-avenue",
+                        "São Paulo",
+                        "SP",
+                        OffsetDateTime.now()
+                ),
+                new Place(
+                        "Freedom Avenue",
+                        "freedom-avenue",
+                        "São Paulo",
+                        "SP",
+                        OffsetDateTime.now()
+                )
+        );
+
+        repository.saveAll(toCreate);
+
+        List<Place> retrieved = service.retrieveAll(null);
+
+        assertEquals(2, retrieved.size());
+    }
+
+    @Test
+    @DisplayName(value = "Should return places with name containing the specified value")
+    void retrieveAll_ShouldReturnPlaces_WhenNameWasSpecified() {
+        List<Place> toCreate = List.of(
+                new Place(
+                        "Paulista Avenue",
+                        "paulista-avenue",
+                        "São Paulo",
+                        "SP",
+                        OffsetDateTime.now()
+                ),
+                new Place(
+                        "Freedom Avenue",
+                        "freedom-avenue",
+                        "São Paulo",
+                        "SP",
+                        OffsetDateTime.now()
+                )
+        );
+
+        repository.saveAll(toCreate);
+
+        List<Place> retrieved = service.retrieveAll("freedom");
+
+        assertEquals(1, retrieved.size());
     }
 
 }
