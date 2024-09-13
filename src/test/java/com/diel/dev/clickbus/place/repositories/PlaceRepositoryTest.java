@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -84,6 +85,59 @@ class PlaceRepositoryTest {
     @DisplayName(value = "A place should not be returned, when name was not found")
     void findByName_ShouldNotReturnPlace_WhenNameWasNotFound() {
         Optional<Place> retrieved = repository.findByName("Paulista Avenue");
+
+        assertTrue(retrieved.isEmpty());
+    }
+
+    @Test
+    @DisplayName(value = "Should return places, when we have places with name containing the specified value")
+    void findByNameContainingIgnoreCase_ShouldReturnPlaces() {
+        List<Place> toCreate = List.of(
+                new Place(
+                        "Paulista Avenue",
+                        "paulista-avenue",
+                        "São Paulo",
+                        "SP",
+                        OffsetDateTime.now()
+                ),
+                new Place(
+                        "Freedom Avenue",
+                        "freedom-avenue",
+                        "São Paulo",
+                        "SP",
+                        OffsetDateTime.now()
+                )
+        );
+
+        repository.saveAll(toCreate);
+
+        List<Place> retrieved = repository.findByNameContainingIgnoreCase("freedom");
+
+        assertEquals(1, retrieved.size());
+    }
+
+    @Test
+    void findByNameContainingIgnoreCase_ShouldNotReturnPlaces_WhenWeDoNotHavePlacesWithTheSpecifiedValue() {
+        List<Place> toCreate = List.of(
+                new Place(
+                        "Paulista Avenue",
+                        "paulista-avenue",
+                        "São Paulo",
+                        "SP",
+                        OffsetDateTime.now()
+                ),
+                new Place(
+                        "Freedom Avenue",
+                        "freedom-avenue",
+                        "São Paulo",
+                        "SP",
+                        OffsetDateTime.now()
+                )
+        );
+
+        repository.saveAll(toCreate);
+
+        List<Place> retrieved = repository.findByNameContainingIgnoreCase("Route 66");
 
         assertTrue(retrieved.isEmpty());
     }
