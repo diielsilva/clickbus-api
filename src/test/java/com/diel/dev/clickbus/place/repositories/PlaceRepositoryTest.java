@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.containers.MySQLContainer;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,7 +38,7 @@ class PlaceRepositoryTest {
 
     @Test
     @DisplayName(value = "A place should be returned, when slug was found")
-    void findBySlug_ShouldReturnSlug() {
+    void findBySlug_ShouldReturnPlace() {
         Place toCreate = new Place(
                 "Paulista Avenue",
                 "paulista-avenue",
@@ -55,8 +56,34 @@ class PlaceRepositoryTest {
 
     @Test
     @DisplayName(value = "A place should not be returned, when slug was not found")
-    void findBySlug_ShouldNotReturnSlug_WhenSlugIsNotFound() {
+    void findBySlug_ShouldNotReturnPlace_WhenSlugIsNotFound() {
         Optional<Place> retrieved = repository.findBySlug("paulista-avenue");
+
+        assertTrue(retrieved.isEmpty());
+    }
+
+    @Test
+    @DisplayName(value = "A place should be returned, when name was found")
+    void findByName_ShouldReturnPlace() {
+        Place toCreate = new Place(
+                "Paulista Avenue",
+                "paulista-avenue",
+                "São Paulo",
+                "SP",
+                OffsetDateTime.now()
+        );
+
+        Place created = repository.save(toCreate);
+
+        Optional<Place> retrieved = repository.findByName(created.getName());
+
+        assertTrue(retrieved.isPresent());
+    }
+
+    @Test
+    @DisplayName(value = "A place should not be returned, when name was not found")
+    void findByName_ShouldNotReturnPlace_WhenNameWasNotFound() {
+        Optional<Place> retrieved = repository.findByName("Paulista Avenue");
 
         assertTrue(retrieved.isEmpty());
     }
