@@ -32,6 +32,12 @@ public class Place {
     public Place() {
     }
 
+    public Place(String name, String city, String state) {
+        this.name = name;
+        this.city = city;
+        this.state = state;
+    }
+
     public Place(
             String name,
             String slug,
