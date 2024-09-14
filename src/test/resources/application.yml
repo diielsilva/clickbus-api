@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:tc:mysql:9.0.1:///click_bus?createDatabaseIfNotExist=true
+    username: root
+    password: test
+
+  jpa:
+    hibernate:
+      ddlAuto: update
+      showSql: true
