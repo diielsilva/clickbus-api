@@ -259,4 +259,19 @@ class PlaceServiceTest {
         assertThrows(ConstraintConflictException.class,
                 () -> service.update(null, slug, toUpdate));
     }
+
+    @Test
+    void remove_ShouldRemovePlace() {
+        Place toCreate = new Place(
+                "Paulista Avenue",
+                "São Paulo",
+                "SP"
+        );
+
+        Place created = service.create(toCreate);
+
+        String slug = created.getSlug();
+
+        assertDoesNotThrow(() -> service.remove(null, slug));
+    }
 }

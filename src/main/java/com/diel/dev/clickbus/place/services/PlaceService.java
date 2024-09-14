@@ -83,6 +83,12 @@ public class PlaceService {
         return repository.save(toUpdate);
     }
 
+    public void remove(Integer id, String slug) {
+        Place toRemove = retrieve(id, slug);
+
+        repository.delete(toRemove);
+    }
+
     private String getSlug(String name) {
         return name.replace(" ", "-").toLowerCase();
     }
