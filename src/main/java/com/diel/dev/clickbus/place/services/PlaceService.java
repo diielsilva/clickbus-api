@@ -3,6 +3,8 @@ package com.diel.dev.clickbus.place.services;
 import com.diel.dev.clickbus.place.entities.Place;
 import com.diel.dev.clickbus.place.repositories.PlaceRepository;
 import com.diel.dev.clickbus.shared.exceptions.ConstraintConflictException;
+import com.diel.dev.clickbus.shared.exceptions.EntityNotFoundException;
+import com.diel.dev.clickbus.shared.exceptions.QueryParameterNotSpecifiedException;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -33,11 +35,32 @@ public class PlaceService {
     }
 
     public List<Place> retrieveAll(String name) {
-        if (name == null || name.isEmpty() || name.isBlank()) {
+        boolean isNameNotSpecified = name == null || name.isEmpty() || name.isBlank();
+
+        if (isNameNotSpecified) {
             return repository.findAll();
         }
 
         return repository.findByNameContainingIgnoreCase(name);
+    }
+
+    public Place retrieve(Integer id, String slug) {
+        boolean isIdPresent = id != null;
+        boolean isSlugPresent = slug != null && !slug.isEmpty() && !slug.isBlank();
+
+        if (isIdPresent) {
+            return repository
+                    .findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Place not found"));
+        }
+
+        if (isSlugPresent) {
+            return repository
+                    .findBySlug(slug)
+                    .orElseThrow(() -> new EntityNotFoundException("Place not found"));
+        }
+
+        throw new QueryParameterNotSpecifiedException("Missing query parameters, you must specify an id or a slug");
     }
 
     private String getSlug(String name) {

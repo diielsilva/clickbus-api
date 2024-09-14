@@ -3,6 +3,8 @@ package com.diel.dev.clickbus.place.services;
 import com.diel.dev.clickbus.place.entities.Place;
 import com.diel.dev.clickbus.place.repositories.PlaceRepository;
 import com.diel.dev.clickbus.shared.exceptions.ConstraintConflictException;
+import com.diel.dev.clickbus.shared.exceptions.EntityNotFoundException;
+import com.diel.dev.clickbus.shared.exceptions.QueryParameterNotSpecifiedException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -128,4 +130,49 @@ class PlaceServiceTest {
         assertEquals(1, retrieved.size());
     }
 
+    @Test
+    @DisplayName(value = "Should return a place, when id was specified and place was found")
+    void retrieve_ShouldRetrievePlace_WhenIdWasSpecified() {
+        Place toCreate = new Place(
+                "Paulista Avenue",
+                "São Paulo",
+                "SP"
+        );
+
+        Place created = service.create(toCreate);
+
+        assertDoesNotThrow(() -> service.retrieve(created.getId(), null));
+    }
+
+    @Test
+    @DisplayName(value = "Should return a place, whe slug was specified and place was found")
+    void retrieve_ShouldRetrievePlace_WhenSlugWasSpecified() {
+        Place toCreate = new Place(
+                "Paulista Avenue",
+                "São Paulo",
+                "SP"
+        );
+
+        Place created = service.create(toCreate);
+
+        assertDoesNotThrow(() -> service.retrieve(null, created.getSlug()));
+    }
+
+    @Test
+    @DisplayName(value = "Should throws entity not found exception, when id was specified but not found")
+    void retrieve_ShouldNotRetrievePlace_WhenIdWasNotFound() {
+        assertThrows(EntityNotFoundException.class, () -> service.retrieve(0, null));
+    }
+
+    @Test
+    @DisplayName(value = "Should throws entity not found exception, whe slug was specified but not found")
+    void retrieve_ShouldNotRetrievePlace_WhenSlugWasNotFound() {
+        assertThrows(EntityNotFoundException.class, () -> service.retrieve(null, "paulista-avenue"));
+    }
+
+    @Test
+    @DisplayName(value = "Should throws query parameter not specified exception, when no one parameter was given")
+    void retrieve_ShouldNotRetrievePlace_WhenIdOrSlugWereNotSpecified() {
+        assertThrows(QueryParameterNotSpecifiedException.class, () -> service.retrieve(null, null));
+    }
 }
