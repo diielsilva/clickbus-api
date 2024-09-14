@@ -63,6 +63,26 @@ public class PlaceService {
         throw new QueryParameterNotSpecifiedException("Missing query parameters, you must specify an id or a slug");
     }
 
+    public Place update(Integer id, String slug, Place toReplace) {
+        Place toUpdate = retrieve(id, slug);
+        boolean isNameInUse = repository.findByName(toReplace.getName()).isPresent();
+        boolean areNamesDifferent = !toUpdate.getName().equals(toReplace.getName());
+
+        if(isNameInUse && areNamesDifferent) {
+            throw new ConstraintConflictException("Place name is already in use");
+        }
+
+        String newSlug = getSlug(toReplace.getName());
+
+        toUpdate.setName(toReplace.getName());
+        toUpdate.setSlug(newSlug);
+        toUpdate.setCity(toReplace.getCity());
+        toUpdate.setState(toReplace.getState());
+        toUpdate.setUpdatedAt(OffsetDateTime.now());
+
+        return repository.save(toUpdate);
+    }
+
     private String getSlug(String name) {
         return name.replace(" ", "-").toLowerCase();
     }

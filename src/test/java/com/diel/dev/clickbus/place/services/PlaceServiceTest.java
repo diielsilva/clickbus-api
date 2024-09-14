@@ -175,4 +175,88 @@ class PlaceServiceTest {
     void retrieve_ShouldNotRetrievePlace_WhenIdOrSlugWereNotSpecified() {
         assertThrows(QueryParameterNotSpecifiedException.class, () -> service.retrieve(null, null));
     }
+
+    @Test
+    @DisplayName(value = "Should update place, when names are equal")
+    void update_ShouldUpdatePlace_WhenNamesAreEqual() {
+        Place toCreate = new Place(
+                "Paulista Avenue",
+                "São Paulo",
+                "SP"
+        );
+
+        Place toUpdate = new Place(
+                "Paulista Avenue",
+                "São Paulo",
+                "SP"
+        );
+
+        Place created = service.create(toCreate);
+
+        Place updated = service.update(created.getId(), null, toUpdate);
+
+        assertAll(() -> {
+            assertEquals(created.getName(), updated.getName());
+            assertNotNull(updated.getUpdatedAt());
+        });
+    }
+
+    @Test
+    @DisplayName(value = "Should update place, when names are different but new name is not in use")
+    void update_ShouldUpdatePlace_WhenNamesAreDifferentButNameIsNotInUse() {
+        Place toCreate = new Place(
+                "Paulista Avenue",
+                "São Paulo",
+                "SP"
+        );
+
+        Place toUpdate = new Place(
+                "Freedom Avenue",
+                "São Paulo",
+                "SP"
+        );
+
+        Place created = service.create(toCreate);
+
+        Place updated = service.update(created.getId(), null, toUpdate);
+
+        assertAll(() -> {
+            assertNotEquals(created.getName(), updated.getName());
+            assertNotNull(updated.getUpdatedAt());
+        });
+    }
+
+    @Test
+    @DisplayName(value = "Should throws constraint conflict exception, when new name is in use by other place")
+    void update_ShouldNotUpdate_WhenNameIsInUseByOtherPlace() {
+        List<Place> toCreate = List.of(
+                new Place(
+                        "Paulista Avenue",
+                        "paulista-avenue",
+                        "São Paulo",
+                        "SP",
+                        OffsetDateTime.now()
+                ),
+                new Place(
+                        "Freedom Avenue",
+                        "freedom-avenue",
+                        "São Paulo",
+                        "SP",
+                        OffsetDateTime.now()
+                )
+        );
+
+        Place toUpdate = new Place(
+                "Paulista Avenue",
+                "São Paulo",
+                "SP"
+        );
+
+        repository.saveAll(toCreate);
+
+        String slug = toCreate.getLast().getSlug();
+
+        assertThrows(ConstraintConflictException.class,
+                () -> service.update(null, slug, toUpdate));
+    }
 }
