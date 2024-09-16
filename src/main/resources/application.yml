@@ -1,1 +1,16 @@
-spring.application.name=clickbus
+spring:
+  application:
+    name: clickbus-api
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/clickbus?createDatabaseIfNotExist=true
+    username: root
+    password: 12345
+
+  jpa:
+    hibernate:
+      ddlAuto: update
+
+server:
+  servlet:
+    contextPath: /api/v1
